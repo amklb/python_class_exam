@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 from time import sleep
-
+from statistics import mean
 class Book():
     def __init__(self, title, author, year, pages):
         self.title = title
@@ -38,7 +38,19 @@ class BookCollection():
             book_list.append(book_dict)
         df = pd.DataFrame(book_list)
         return df
-
+    def book_summary(self):
+        summary_dict = {}
+        summary_dict["Number of books: "] = len(self.collection)
+        summary_dict["Average number of pages"] = mean([int(x.pages) for x in self.collection])
+        oldest_title = ""
+        oldest_year = 3000
+        for book in self.collection:
+            if int(book.year) < oldest_year:
+                oldest_title = book.title
+                oldest_year = int(book.year)
+        summary_dict["Oldest book"] = oldest_title + ", " + str(oldest_year)
+        return summary_dict
+    
 class BookManager():
     def __init__(self):
         self.collection = BookCollection()
@@ -48,7 +60,7 @@ class BookManager():
     def menu(self):
         print("Welcome to book manager!")
         while True:
-            print("Enter a number to continue:\n 1. Add book\n 2. View titles in collection\n 3. View collection\n 4. Save collection\n 5. Load collection\n 6. View saved collections\n 7. Exit ")
+            print("Enter a number to continue:\n 1. Add book\n 2. View titles in collection\n 3. View collection\n 4. Save collection\n 5. Load collection\n 6. View saved collections\n 7. View summary of collection \n 8. Exit ")
             n = input("Number: ")
             if n == "1": # Add book
                 book_data = input("Please enter comma-separated: title, author, year, pages ").split(sep=", ")
@@ -64,7 +76,9 @@ class BookManager():
                 self.load_collection()
             elif n == "6": # View saved collections
                 self.list_files()
-            elif n == "7": # Exit
+            elif n == "7": # Summary
+                self.book_summary()
+            elif n == "8": # Exit
                 exit(code= 0)
             else:
                 print("Incorrect number!")
@@ -104,3 +118,5 @@ class BookManager():
             self.add_book(book)
         print("Collection loaded!")
 
+    def book_summary(self):
+        print(self.collection.book_summary())
